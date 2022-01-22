@@ -20,5 +20,6 @@ module.exports = {
   rules: {
     'no-unused-vars': ['warn', { vars: 'all', args: 'after-used', ignoreRestSiblings: false }],
     'react/prop-types': ['warn'],
+    'no-plusplus': ['warn'],
   },
 };
