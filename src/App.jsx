@@ -179,8 +179,6 @@ function App() {
         wrdle
       </Typography>
 
-      <p>{pickedWord}</p>
-
       {rows.map((row, index) => (
         <Grid container>
           <Grid item xs={1} />
