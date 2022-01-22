@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Typography,
@@ -7,52 +7,6 @@ import {
 } from '@mui/material';
 import words from './words.json';
 import utils from './utils';
-
-const checkRowStatus = (pickedWord, row) => {
-  // Three status
-  /*
-    G - green, it's the right letter in the right spot
-    Y - yellow, the letter is in the word, but the wrong spot
-    R - red, the letter is not in the word
-  */
-
-  const rowStatus = [
-    '', '', '', '', '',
-  ];
-
-  // Check for Yellow
-  // Do this first to overwrite if green
-  for (let i = 0; i < 5; i++) {
-    if (
-      row[i] === pickedWord[0]
-      || row[i] === pickedWord[1]
-      || row[i] === pickedWord[2]
-      || row[i] === pickedWord[3]
-      || row[i] === pickedWord[4]
-
-    ) {
-      rowStatus[i] = 'Y';
-    }
-  }
-
-  // Check for Green
-  for (let i = 0; i < 5; i++) {
-    if (pickedWord[i] === row[i]) {
-      rowStatus[i] = 'G';
-    }
-  }
-
-  // If any are left, they are not in it, so set Red
-  for (let i = 0; i < 5; i++) {
-    if (
-      rowStatus[i] === ''
-    ) {
-      rowStatus[i] = 'R';
-    }
-  }
-
-  return rowStatus;
-};
 
 const handleLetterEnter = (
   e,
@@ -63,13 +17,9 @@ const handleLetterEnter = (
   pickedWord,
   rowStatus,
   setRowStatus,
+  setFocusId,
 ) => {
   const { value } = e.target;
-  // Validate value is letter
-  if (!(/[a-zA-Z]/).test(value)) {
-    // TODO error handle?
-    return;
-  }
   // index should be x;y as string, with both values starting at 0 in top left corner
   const index = e.target.name;
   const x = parseInt(index.split(';')[0], 10);
@@ -96,23 +46,38 @@ const handleLetterEnter = (
   if (newRows[y][x] !== '') {
     newValue = value.charAt(value.length - 1);
   }
+  // Validate value is letter
+  if (!(/[a-zA-Z]/).test(newValue)) {
+    // TODO error handle?
+    return;
+  }
   newRows[y][x] = newValue.toUpperCase();
 
   setRows(newRows);
 
-  // TODO focus on next element
+  // Handle Focus
+  if (x !== 4) {
+    setFocusId(`${x + 1};${y}`);
+  } else if (x === 4) {
+    setFocusId(`${0};${y + 1}`);
+  }
 
   const row = newRows[y];
   let newRowStatus = null;
-  if (x === 4) {
-    newRowStatus = checkRowStatus(pickedWord, row);
-  }
 
-  if (newRowStatus) {
+  // Only do after entering last item
+  if (x === 4) {
+    newRowStatus = utils.checkRowStatus(pickedWord, row);
+
     if (newRowStatus.join('') === 'GGGGG') {
       console.log('WINNER');
     } else {
+      // Move to next row and lock current row
+      setGuessAttempt(guessAttempt + 1);
       console.log('LOSER');
+      if (guessAttempt === 5) {
+        // TODO overall loser message
+      }
     }
   }
 };
@@ -141,6 +106,7 @@ function App() {
       ['', '', '', '', ''],
     ],
   );
+  const [focusId, setFocusId] = useState('0;0');
 
   return (
     <Container disableGutters maxWidth="sm" component="main" sx={{ pt: 8, pb: 6 }}>
@@ -163,6 +129,14 @@ function App() {
           {row.map((r, i) => (
             <Grid item xs={2} padding={1}>
               <TextField
+                // eslint-disable-next-line consistent-return
+                inputRef={(input) => {
+                  if (input) {
+                    if (focusId === input.id) {
+                      return input && input.focus();
+                    }
+                  }
+                }}
                 name={`${i};${index}`}
                 id={`${i};${index}`}
                 variant="outlined"
@@ -176,6 +150,8 @@ function App() {
                   pickedWord,
                   rowStatus,
                   setRowStatus,
+                  focusId,
+                  setFocusId,
                 )}
               />
             </Grid>
