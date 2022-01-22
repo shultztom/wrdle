@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Typography,
@@ -7,6 +7,19 @@ import {
 } from '@mui/material';
 import words from './words.json';
 import utils from './utils';
+
+const getBackgroundColor = (i, index, rowStatus) => {
+  if (rowStatus[index][i] === '') {
+    return 'gray';
+  }
+  if (rowStatus[index][i] === 'G') {
+    return 'green';
+  }
+  if (rowStatus[index][i] === 'Y') {
+    return 'yellow';
+  }
+  return 'red';
+};
 
 const handleLetterEnter = (
   e,
@@ -69,6 +82,12 @@ const handleLetterEnter = (
   if (x === 4) {
     newRowStatus = utils.checkRowStatus(pickedWord, row);
 
+    // Color Cells
+    const newRowStatuses = [...rowStatus];
+    newRowStatuses[y] = newRowStatus;
+    setRowStatus(newRowStatuses);
+
+    // Determine if winner
     if (newRowStatus.join('') === 'GGGGG') {
       console.log('WINNER');
     } else {
@@ -136,6 +155,9 @@ function App() {
                       return input && input.focus();
                     }
                   }
+                }}
+                sx={{
+                  backgroundColor: getBackgroundColor(i, index, rowStatus),
                 }}
                 name={`${i};${index}`}
                 id={`${i};${index}`}
