@@ -18,8 +18,30 @@ const checkRowStatus = (pickedWord, row) => {
     '', '', '', '', '',
   ];
 
+  // Get count of each letter
+  const letterCount = [...pickedWord].reduce((a, e) => {
+    // eslint-disable-next-line no-param-reassign
+    a[e] = a[e] ? a[e] + 1 : 1;
+    return a;
+  }, {});
+
+  // Keep count of each letter match for yellows
+  const guessLetterCount = {};
+
+  // Check for Green
+  for (let i = 0; i < 5; i++) {
+    if (pickedWord[i] === row[i]) {
+      rowStatus[i] = 'G';
+
+      if (guessLetterCount[row[i]]) {
+        guessLetterCount[row[i]] += 1;
+      } else {
+        guessLetterCount[row[i]] = 1;
+      }
+    }
+  }
+
   // Check for Yellow
-  // Do this first to overwrite if green
   for (let i = 0; i < 5; i++) {
     if (
       row[i] === pickedWord[0]
@@ -29,18 +51,27 @@ const checkRowStatus = (pickedWord, row) => {
         || row[i] === pickedWord[4]
 
     ) {
-      rowStatus[i] = 'Y';
+      // Ensure we only have as many yellows as in letter if not in word
+      if (guessLetterCount[row[i]]) {
+        // if counts are the same, leave gray
+        if (guessLetterCount[row[i]] === letterCount[row[i]]) {
+          // do nothing
+        } else {
+          // Don't overwrite green, but set yellow if needed
+          // eslint-disable-next-line no-lonely-if
+          if (pickedWord[i] !== row[i]) {
+            rowStatus[i] = 'Y';
+            guessLetterCount[row[i]] += 1;
+          }
+        }
+      } else {
+        guessLetterCount[row[i]] = 1;
+        rowStatus[i] = 'Y';
+      }
     }
   }
 
-  // Check for Green
-  for (let i = 0; i < 5; i++) {
-    if (pickedWord[i] === row[i]) {
-      rowStatus[i] = 'G';
-    }
-  }
-
-  // If any are left, they are not in it, so set Red
+  // If any are left, they are not in it, so set Gray
   for (let i = 0; i < 5; i++) {
     if (
       rowStatus[i] === ''

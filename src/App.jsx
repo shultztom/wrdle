@@ -21,7 +21,7 @@ const getBackgroundColor = (i, index, rowStatus) => {
   if (rowStatus[index][i] === 'Y') {
     return 'yellow';
   }
-  return 'red';
+  return 'gray';
 };
 
 const handleLetterEnter = (
@@ -178,6 +178,8 @@ function App() {
       >
         wrdle
       </Typography>
+
+      <p>{pickedWord}</p>
 
       {rows.map((row, index) => (
         <Grid container>
