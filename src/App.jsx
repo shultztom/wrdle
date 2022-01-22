@@ -4,9 +4,12 @@ import {
   Typography,
   Grid,
   TextField,
+  Button,
 } from '@mui/material';
 import words from './words.json';
 import utils from './utils';
+import WinnerDialog from './WinnerDialog';
+import LoserDialog from './LoserDialog';
 
 const getBackgroundColor = (i, index, rowStatus) => {
   if (rowStatus[index][i] === '') {
@@ -31,6 +34,9 @@ const handleLetterEnter = (
   rowStatus,
   setRowStatus,
   setFocusId,
+  setIsWinner,
+  setIsLoser,
+  setIsGameOver,
 ) => {
   const { value } = e.target;
   // index should be x;y as string, with both values starting at 0 in top left corner
@@ -89,13 +95,14 @@ const handleLetterEnter = (
 
     // Determine if winner
     if (newRowStatus.join('') === 'GGGGG') {
-      console.log('WINNER');
+      setIsWinner(true);
+      setIsGameOver(true);
     } else {
       // Move to next row and lock current row
       setGuessAttempt(guessAttempt + 1);
-      console.log('LOSER');
       if (guessAttempt === 5) {
-        // TODO overall loser message
+        setIsLoser(true);
+        setIsGameOver(true);
       }
     }
   }
@@ -126,6 +133,39 @@ function App() {
     ],
   );
   const [focusId, setFocusId] = useState('0;0');
+  const [isWinner, setIsWinner] = useState(false);
+  const [isLoser, setIsLoser] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
+
+  const handlePlayAgain = () => {
+    setGuessAttempt(0);
+    setRows(
+      [
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+      ],
+    );
+    const newWordIndex = utils.getRandomInt(0, words.length - 1);
+    setPickedWord(words[newWordIndex]);
+    setRowStatus(
+      [
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+      ],
+    );
+    setFocusId('0;0');
+    setIsWinner(false);
+    setIsLoser(false);
+    setIsGameOver(false);
+  };
 
   return (
     <Container disableGutters maxWidth="sm" component="main" sx={{ pt: 8, pb: 6 }}>
@@ -138,8 +178,6 @@ function App() {
       >
         wrdle
       </Typography>
-
-      <p>{pickedWord}</p>
 
       {rows.map((row, index) => (
         <Grid container>
@@ -173,6 +211,9 @@ function App() {
                   rowStatus,
                   setRowStatus,
                   setFocusId,
+                  setIsWinner,
+                  setIsLoser,
+                  setIsGameOver,
                 )}
               />
             </Grid>
@@ -181,6 +222,22 @@ function App() {
           <Grid item xs={1} />
         </Grid>
       ))}
+
+      {(isGameOver) && (
+      <Grid container>
+        <Grid item xs={12} textAlign="center">
+          <Button onClick={handlePlayAgain}>Play Again</Button>
+        </Grid>
+      </Grid>
+      )}
+
+      <WinnerDialog open={isWinner} setIsWinner={setIsWinner} handlePlayAgain={handlePlayAgain} />
+      <LoserDialog
+        open={isLoser}
+        setIsLoser={setIsLoser}
+        handlePlayAgain={handlePlayAgain}
+        pickedWord={pickedWord}
+      />
 
     </Container>
 
