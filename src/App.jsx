@@ -150,7 +150,6 @@ function App() {
                   pickedWord,
                   rowStatus,
                   setRowStatus,
-                  focusId,
                   setFocusId,
                 )}
               />
