@@ -10,6 +10,7 @@ import words from './words.json';
 import utils from './utils';
 import WinnerDialog from './WinnerDialog';
 import LoserDialog from './LoserDialog';
+import InstructionsDialog from './InstructionsDialog';
 
 const getBackgroundColor = (i, index, rowStatus) => {
   if (rowStatus[index][i] === '') {
@@ -136,6 +137,7 @@ function App() {
   const [isWinner, setIsWinner] = useState(false);
   const [isLoser, setIsLoser] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   const handlePlayAgain = () => {
     setGuessAttempt(0);
@@ -178,6 +180,15 @@ function App() {
       >
         wrdle
       </Typography>
+
+      <Grid container>
+        <Grid item xs={12} textAlign="center">
+          <Button onClick={() => setShowInstructions(true)}>
+            Don&lsquo;t Know How to Play? Click Here?
+
+          </Button>
+        </Grid>
+      </Grid>
 
       {rows.map((row, index) => (
         <Grid container>
@@ -237,6 +248,10 @@ function App() {
         setIsLoser={setIsLoser}
         handlePlayAgain={handlePlayAgain}
         pickedWord={pickedWord}
+      />
+      <InstructionsDialog
+        showInstructions={showInstructions}
+        setShowInstructions={setShowInstructions}
       />
 
     </Container>
