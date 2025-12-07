@@ -6,7 +6,7 @@ import {
   TextField,
   Button,
 } from '@mui/material';
-import words from './words.json';
+import words from './wordsCleaned.json';
 import utils from './utils';
 import WinnerDialog from './WinnerDialog';
 import LoserDialog from './LoserDialog';

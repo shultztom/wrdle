@@ -40,12 +40,10 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-production
-  tls:
-    - secretName: wrdle-tls
-      hosts:
-        - wrdle.shultzlab.com
   hosts:
+    - host: wrdle.internalshultzlab.com
+      paths: 
+        - name: /
     - host: wrdle.shultzlab.com
       paths: 
         - name: /

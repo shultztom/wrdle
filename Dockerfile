@@ -1,5 +1,5 @@
 # Get node to build
-FROM node:16.13-alpine as builder
+FROM node:24-alpine as builder
 
 # Create app directory
 WORKDIR /app
@@ -13,7 +13,7 @@ COPY . .
 RUN [ "npm", "run", "build" ]
 
 # Get nginx to serve
-FROM nginxinc/nginx-unprivileged:stable
+FROM nginxinc/nginx-unprivileged:stable-alpine-slim
 
 # Set up nginx conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
